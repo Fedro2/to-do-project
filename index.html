@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <form id="todo-form">
+            <input type="text" id="title" placeholder="Title" required>
+            <input type="text" id="description" placeholder="Description" required>
+            <input type="text" id="author" placeholder="Autor" required>
+            <input type="text" id="category" placeholder="Kategorie" required>
+            <label><input type="checkbox" id="important"> Wichtig</label>
+            <label><input type="checkbox" id="urgent"> Dringend</label>
+            <input type="date" id="start-date" placeholder="Start Date" required>
+            <input type="date" id="end-date" placeholder="End Date" required>
+            <label>Progress: <input type="range" id="progress" min="0" max="100" value="0"></label>
+            <button type="submit">Add</button>
+        </form>
+        <ul id="todo-list"></ul>
+    </div>
+
+    <div id="edit-popup" class="popup">
+        <form id="edit-form">
+            <input type="text" id="edit-title" placeholder="Title" required>
+            <input type="text" id="edit-description" placeholder="Description" required>
+            <input type="text" id="edit-author" placeholder="Autor" required>
+            <input type="text" id="edit-category" placeholder="Kategorie" required>
+            <label><input type="checkbox" id="edit-important"> Wichtig</label>
+            <label><input type="checkbox" id="edit-urgent"> Dringend</label>
+            <input type="date" id="edit-start-date" placeholder="Start Date" required>
+            <input type="date" id="edit-end-date" placeholder="End Date" required>
+            <label>Progress: <input type="range" id="edit-progress" min="0" max="100" value="0"></label>
+            <button type="submit">Save</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
