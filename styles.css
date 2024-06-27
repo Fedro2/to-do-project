@@ -1,6 +1,6 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-color: #fdf0d5;
     margin: 0;
     padding: 0;
     display: flex;
@@ -9,15 +9,23 @@ body {
     min-height: 100vh;
 }
 
+.whole{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+
+}
 .container {
     background-color: white;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 1200px;
+    width: 500px;
     margin-top: 20px;
 }
+
+
 
 h1 {
     text-align: center;
@@ -34,8 +42,11 @@ input, select, button, label {
     font-size: 16px;
 }
 
+
+
+
 button {
-    background-color: #007BFF;
+    background-color: #c1121f;
     color: white;
     border: none;
     border-radius: 5px;
@@ -43,7 +54,7 @@ button {
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #780000;
 }
 
 ul {
@@ -61,25 +72,25 @@ li {
     border-radius: 5px;
     display: flex;
     flex-direction: column;
-    width: calc(25% - 20px); /* Adjusted to make them larger */
+    width: calc(25% - 20px); 
     box-sizing: border-box;
-    min-width: 250px; /* Minimum width for better visibility */
+    min-width: 250px; 
 }
 
 .priority-1 {
-    background-color: red;
+    background-color: #e76f51;
 }
 
 .priority-2 {
-    background-color: yellow;
+    background-color: #e9c46a;
 }
 
 .priority-3 {
-    background-color: green;
+    background-color: #6a994e;
 }
 
 .priority-4 {
-    background-color: blue;
+    background-color: #0077b6;
 }
 
 .popup {
@@ -105,5 +116,5 @@ li {
 
 .progress {
     height: 100%;
-    background-color: #007BFF;
+    background-color: #c1121f;
 }

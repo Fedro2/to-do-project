@@ -1,85 +1,172 @@
+//Verbindet die HTML mit dem JS
 document.addEventListener('DOMContentLoaded', () => {
+    //speichert die Elemente in Variablen
     const todoForm = document.getElementById('todo-form');
     const todoList = document.getElementById('todo-list');
-    const editPopup = document.getElementById('edit-popup');
+    const searchBar = document.getElementById('search-bar');
     const editForm = document.getElementById('edit-form');
-    
-    let todos = [];
-    let editIndex = null;
+    const editPopup = document.getElementById('edit-popup');
 
+    let todos = [];
+    let currentEditIndex = null;
+//stellt ein evenlistener zum submiten des Formulars her, er antwortet auf das submit button
     todoForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const title = document.getElementById('title').value;
-        const description = document.getElementById('description').value;
-        const author = document.getElementById('author').value;
-        const category = document.getElementById('category').value;
-        const important = document.getElementById('important').checked;
-        const urgent = document.getElementById('urgent').checked;
-        const startDate = document.getElementById('start-date').value;
-        const endDate = document.getElementById('end-date').value;
-        const progress = document.getElementById('progress').value;
         
-        const todo = { title, description, author, category, important, urgent, startDate, endDate, progress };
+        const title = document.getElementById('title');
+        const description = document.getElementById('description');
+        const author = document.getElementById('author');
+        const category = document.getElementById('category');
+        const startDate = document.getElementById('start-date');
+        const endDate = document.getElementById('end-date');
+        const progress = document.getElementById('progress');
+//holt sich das heutige Datum
+        const today = new Date().toISOString().split('T')[0];
+//Validierung der Eingaben
+        if (!validateText(title.value) || !validateText(description.value) || !validateText(author.value)) {
+            alert('Textfelder dürfen nicht nur Leerzeichen enthalten und keine Sonderzeichen (%&*# etc.) enthalten.');
+            return;
+        }
+
+        if (startDate.value < today) {
+            alert('Das Startdatum darf nicht früher als heute sein.');
+            return;
+        }
+
+        if (endDate.value < startDate.value) {
+            alert('Das Enddatum darf nicht früher als das Startdatum sein.');
+            return;
+        }
+
+        if (!title.value || !description.value || !author.value || !category.value || !startDate.value || !endDate.value) {
+            alert('Bitte füllen Sie alle Pflichtfelder aus.');
+            return;
+        }
+
+        const todo = {
+            title: title.value,
+            description: description.value,
+            author: author.value,
+            category: category.value,
+            important: document.getElementById('important').checked,
+            urgent: document.getElementById('urgent').checked,
+            startDate: startDate.value,
+            endDate: endDate.value,
+            progress: progress.value
+        };
+
         todos.push(todo);
-        renderTodos();
+        sortTodos();
+        renderTodos(todos);
         todoForm.reset();
     });
-
+//search bar event listener, reagiert auf dem input vom user
+    searchBar.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        aufgabenSuchen(searchTerm);
+    });
+// bearbeiten der Todos
     editForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const title = document.getElementById('edit-title').value;
-        const description = document.getElementById('edit-description').value;
-        const author = document.getElementById('edit-author').value;
-        const category = document.getElementById('edit-category').value;
-        const important = document.getElementById('edit-important').checked;
-        const urgent = document.getElementById('edit-urgent').checked;
-        const startDate = document.getElementById('edit-start-date').value;
-        const endDate = document.getElementById('edit-end-date').value;
-        const progress = document.getElementById('edit-progress').value;
-        
-        todos[editIndex] = { title, description, author, category, important, urgent, startDate, endDate, progress };
-        renderTodos();
-        closeEditPopup();
-    });
 
-    function renderTodos() {
-        todoList.innerHTML = '';
-        // Sort todos to ensure priority order: red, yellow, green, blue
+        const title = document.getElementById('edit-title');
+        const description = document.getElementById('edit-description');
+        const author = document.getElementById('edit-author');
+        const category = document.getElementById('edit-category');
+        const startDate = document.getElementById('edit-start-date');
+        const endDate = document.getElementById('edit-end-date');
+        const progress = document.getElementById('edit-progress');
+
+        const today = new Date().toISOString().split('T')[0];
+//Validierung
+        if (!validateText(title.value) || !validateText(description.value) || !validateText(author.value)) {
+            alert('Textfelder dürfen nicht nur Leerzeichen enthalten und keine Sonderzeichen (%&*# etc.) enthalten.');
+            return;
+        }
+
+        if (startDate.value < today) {
+            alert('Das Startdatum darf nicht früher als heute sein.');
+            return;
+        }
+
+        if (endDate.value < startDate.value) {
+            alert('Das Enddatum darf nicht früher als das Startdatum sein.');
+            return;
+        }
+
+        if (!title.value || !description.value || !author.value || !category.value || !startDate.value || !endDate.value) {
+            alert('Bitte füllen Sie alle Pflichtfelder aus.');
+            return;
+        }
+
+        const updatedTodo = {
+            title: title.value,
+            description: description.value,
+            author: author.value,
+            category: category.value,
+            important: document.getElementById('edit-important').checked,
+            urgent: document.getElementById('edit-urgent').checked,
+            startDate: startDate.value,
+            endDate: endDate.value,
+            progress: progress.value
+        };
+
+        todos[currentEditIndex] = updatedTodo;
+        sortTodos();
+        renderTodos(todos);
+        editPopup.style.display = 'none';
+    });
+//Funktion die validiert ob der text sonderzeichen enthät
+    function validateText(text) {
+        const regex = /^[a-zA-Z0-9 ]+$/;
+        return regex.test(text.trim());
+    }
+
+    function aufgabenSuchen(query) {
+        const gefilterteAufgaben = todos.filter(todo => todo.title.toLowerCase().includes(query.toLowerCase()));
+        renderTodos(gefilterteAufgaben);
+    }
+//funktion sortiert die todos nach Priorität
+    function sortTodos() {
         todos.sort((a, b) => {
-            const priorityA = getPriority(a.important, a.urgent);
-            const priorityB = getPriority(b.important, b.urgent);
+            const priorityA = getPriority(a);
+            const priorityB = getPriority(b);
             return priorityA - priorityB;
         });
+    }
+
+    function renderTodos(todos) {
+        todoList.innerHTML = '';
         todos.forEach((todo, index) => {
             const li = document.createElement('li');
-            const priority = getPriority(todo.important, todo.urgent);
-            li.className = `priority-${priority}`;
+            li.className = `priority-${getPriority(todo)}`;
             li.innerHTML = `
-                <div>
-                    <p>Titel: ${todo.title}</p>
-                    <p>Description: ${todo.description}</p>
-                    <p>Autor: ${todo.author}</p>
-                    <p>Kategorie: ${todo.category}</p>
-                    <p>Wichtig: ${todo.important ? 'Ja' : 'Nein'}</p>
-                    <p>Dringend: ${todo.urgent ? 'Ja' : 'Nein'}</p>
-                    <p>Start Date: ${todo.startDate}</p>
-                    <p>End Date: ${todo.endDate}</p>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: ${todo.progress}%"></div>
-                    </div>
-                </div>
-                <div>
-                    <button onclick="edit(${index})">Edit</button>
-                    <button onclick="done(${index})">Done</button>
-                </div>
+                <h3>${todo.title}</h3>
+                <p>${todo.description}</p>
+                <p><strong>Autor:</strong> ${todo.author}</p>
+                <p><strong>Kategorie:</strong> ${todo.category}</p>
+                <p><strong>Startdatum:</strong> ${todo.startDate}</p>
+                <p><strong>Enddatum:</strong> ${todo.endDate}</p>
+                <div class="progress-bar"><div class="progress" style="width: ${todo.progress}%;"></div></div>
+                <button onclick="editTodo(${index})">Edit</button>
+                <button onclick="deleteTodo(${index})">Delete</button>
             `;
             todoList.appendChild(li);
         });
     }
+//funktion die die Priorität der Todos festlegt
+    function getPriority(todo) {
+        if (todo.important && todo.urgent) return 1;
+        if (todo.important) return 2;
+        if (todo.urgent) return 3;
+        return 4;
+    }
+//Funktionen die die Todos bearbeiten und löschen
 
-    window.edit = (index) => {
-        editIndex = index;
+    window.editTodo = function(index) {
+        currentEditIndex = index;
         const todo = todos[index];
+        
         document.getElementById('edit-title').value = todo.title;
         document.getElementById('edit-description').value = todo.description;
         document.getElementById('edit-author').value = todo.author;
@@ -89,32 +176,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit-start-date').value = todo.startDate;
         document.getElementById('edit-end-date').value = todo.endDate;
         document.getElementById('edit-progress').value = todo.progress;
-        openEditPopup();
-    };
-
-    window.done = (index) => {
-        todos.splice(index, 1);
-        renderTodos();
-    };
-
-    function openEditPopup() {
+        
         editPopup.style.display = 'block';
     }
 
-    function closeEditPopup() {
-        editPopup.style.display = 'none';
-    }
-
-    window.onclick = (event) => {
-        if (event.target == editPopup) {
-            closeEditPopup();
-        }
-    };
-
-    function getPriority(important, urgent) {
-        if (important && urgent) return 1; // Red
-        if (important && !urgent) return 2; // Yellow
-        if (!important && urgent) return 3; // Green
-        return 4; // Blue
+    window.deleteTodo = function(index) {
+        todos.splice(index, 1);
+        renderTodos(todos);
     }
 });
